@@ -50,7 +50,7 @@ int main (int argc, char* argv[]){
 
                 struct my_message msg;
 
-    //recive messefe from daddy
+    //recive message from daddy
                 if (msgrcv (msq_id, &msg, sizeof (msg) - sizeof (long), number, MSG_NOERROR) == -1){
 
                     printf ("cannot recive message from daddy, child #%ld\n", number);
@@ -89,6 +89,7 @@ int main (int argc, char* argv[]){
                 printf ("cannot recive message from child #%ld\n", number);
                 exit (1);
             }
+	}
     //check correctly reciving messages from childrens
             if (msgctl (msq_id, IPC_RMID, NULL) != 0){
 
@@ -96,7 +97,7 @@ int main (int argc, char* argv[]){
                 exit (1);
             }
             //else printf ("oh shit , I`m sorry\n");
-	}
+	
     }
 
 }
