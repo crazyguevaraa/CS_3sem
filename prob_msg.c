@@ -57,8 +57,8 @@ int main (int argc, char* argv[]){
                     exit(1);
                 } 
 
-                printf("I`m child #%ld\n", number);
-                //fflush(0);
+                printf(" #%ld", number);
+                fflush(0);
     //send message to daddy
                 msg.type = num_of_child + 1;
 
