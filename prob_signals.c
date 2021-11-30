@@ -24,7 +24,7 @@ int main (int argc, char* argv []){
         exit (1);
     }
 
-    struct sigaction act;
+    struct sigaction act = {};
     act.sa_handler = Handler;
 
     if ((stat = sigaction (SIGUSR1, &act, NULL)) < 0){
@@ -50,7 +50,7 @@ int main (int argc, char* argv []){
 	    printf ("sigact SIGCHLD err\n");
 	    exit (1);
     }
-
+    
     sigset_t mask;
 
     if ((stat = sigemptyset (&mask)) < 0){
@@ -88,23 +88,23 @@ int main (int argc, char* argv []){
 		    printf ("Daddy is dead\n");
 		    exit (1);
 	    }
-	    sigset_t child_mask;
+	    sigset_t child_mask = {};
 
 	    if ((stat = sigfillset (&child_mask)) < 0){
 	    	 
 		    printf ("sigfill child_mask err\n");
 		    exit (1);
 	    }
-//	    if ((stat = sigdelset (&child_mask, SIGUSR1)) < 0){
-//	    	
-//	    	printf ("sigdel (child_mask) SIGUSR1 err\n");  
-//	  	exit (1);
-//	    }
-//	    if ((stat = sigdelset (&child_mask, SIGTERM)) < 0){
-//	    
-//	    	printf ("sigdel (child_mask) SIGTERM err\n");
-//	    	exit (1);
-//	    }
+	    if ((stat = sigdelset (&child_mask, SIGUSR1)) < 0){
+	    	
+	    	printf ("sigdel (child_mask) SIGUSR1 err\n");  
+	  	exit (1);
+	    }
+	    if ((stat = sigdelset (&child_mask, SIGTERM)) < 0){
+	    
+	    	printf ("sigdel (child_mask) SIGTERM err\n");
+	    	exit (1);
+	    }
 	    char buffer = 0;
 
 	    while (read (file, &buffer, 1) != 0){
@@ -123,7 +123,7 @@ int main (int argc, char* argv []){
     //in parent proc
     else if (child_stat > 0){
 
-	    sigset_t parent_mask;
+	    sigset_t parent_mask = {};
 
 	    if ((stat = sigfillset (&parent_mask)) < 0){
 	     
@@ -143,24 +143,23 @@ int main (int argc, char* argv []){
 		    exit (1);
 	    }
 
-//	    if ((stat = sigdelset (&parent_mask, SIGTERM)) < 0){
-// 
-// 		 printf ("sigdel (parent_mask) SIGTERM err\n");
-//	   	 exit (1);
-//	    }
-//
-//	    if ((stat = sigdelset (&parent_mask, SIGCHLD)) < 0){
-//
-//		 printf ("sigdel (parent_mask) SIGCHLD err\n");
-//	    	 exit (1);
-//	    }
-//
-//	    if ((stat = sigdelset (&parent_mask, SIGSTOP)) < 0){
-//		 
-//		 printf ("sigdel (parent_mask) SIGSTOP err\n");
-//	  	 exit (1);
-//	    }
-//
+	    if ((stat = sigdelset (&parent_mask, SIGTERM)) < 0){
+ 
+ 		 printf ("sigdel (parent_mask) SIGTERM err\n");
+	   	 exit (1);
+	    }
+
+	    if ((stat = sigdelset (&parent_mask, SIGCHLD)) < 0){
+
+		 printf ("sigdel (parent_mask) SIGCHLD err\n");
+	    	 exit (1);
+	    }
+
+	    if ((stat = sigdelset (&parent_mask, SIGSTOP)) < 0){
+		 
+		 printf ("sigdel (parent_mask) SIGSTOP err\n");
+	  	 exit (1);
+	    }
 	    char buffer = 0;
 
 	    for (;;){
@@ -168,17 +167,13 @@ int main (int argc, char* argv []){
 		    buffer = 0;
 		    for (int i = 0; i < 8; i++){
 		    
-			    if ((stat = sigsuspend (&parent_mask)) < 0){
+			    sigsuspend (&parent_mask);
 
-				    printf ("sigsus parent_mask err\n");
-				    exit (1);
-			    }
-			    kill (parent_id, SIGUSR1);
+			    kill (child_stat, SIGUSR1);
 			    buffer = buffer | (bit << i);
-		    }
-		    write (1, &buffer, sizeof (char));
+		    }		    write (1, &buffer, sizeof (char));
 	    }
-	    waitpid (parent_id, NULL, 0);
+	    //waitpid (parent_id, NULL, 0);
 	    
 	
 }
