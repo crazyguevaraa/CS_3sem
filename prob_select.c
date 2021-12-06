@@ -1,3 +1,4 @@
+#define _GNU_SOURSE
 #include <unistd.h>
 #include <math.h>
 #include <stdio.h>
@@ -8,8 +9,6 @@
 #include <sys/prctl.h>
 #include <signal.h>
 #include <assert.h>
-
-#define _GNU_SOURSE
 
 #define MAX(a,b) ((a > b) ? a : b)
 #define MIN(a ,b) ((a < b) ? a : b)
@@ -40,7 +39,7 @@ enum CIRCLE_BUFF_RES {
 
 };
 
-int    create_circle_buff (size_t size, circle_buff *buffer);
+int    create_circle_buff (size_t size, circle_buff buffer);
 int    destroy_circle_buff (circle_buff buffer);
 int    circle_buffer_fd_reader (circle_buff buffer, int fd, size_t num, int *read_res);
 int    circle_buffer_fd_writter (circle_buff buffer, int fd, size_t num, int *write_res);
@@ -253,7 +252,7 @@ int main (int argc, char* argv[]){
             }
         }
 
-        if (select (num_select + 1, &rfds, &wrds, NULL, NULL) < 0){
+        if (select (num_select + 1, &rfds, &wfds, NULL, NULL) < 0){
 
             printf ("err: select()\n");
             exit (1);
@@ -321,15 +320,15 @@ int main (int argc, char* argv[]){
     return 0;
 }
 
-int create_circle_buff (size_t size, circle_buff *buffer){
+int create_circle_buff (size_t size, circle_buff buffer){
 
-    *buffer = (circle_buff) calloc (1, sizeof (circle_buff_t));
+    buffer = (circle_buff) calloc (1, sizeof (circle_buff_t));
     if (buffer == NULL){
 
         return BUF_FAILURE;
     }
     
-    circle_buff tmp = *buffer;
+    circle_buff tmp = buffer;
 
     tmp -> p_buff = (char*) calloc (size , sizeof (char));
     if (tmp -> p_buff == NULL){
