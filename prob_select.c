@@ -1,9 +1,9 @@
-#define _GNU_SOURSE
+#define _GNU_SOURCE
+#include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
@@ -39,7 +39,7 @@ enum CIRCLE_BUFF_RES {
 
 };
 
-int    create_circle_buff (size_t size, circle_buff buffer);
+int    create_circle_buff (size_t size, circle_buff *buffer);
 int    destroy_circle_buff (circle_buff buffer);
 int    circle_buffer_fd_reader (circle_buff buffer, int fd, size_t num, int *read_res);
 int    circle_buffer_fd_writter (circle_buff buffer, int fd, size_t num, int *write_res);
@@ -164,7 +164,7 @@ int main (int argc, char* argv[]){
         //
         else{
 
-            if (create_circle_buff ((size_t)(pow(3, num_of_child - i) * 1024), &(chan_inf[i].buf)) != BUF_SUCCESS){
+            if (create_circle_buff ((size_t)(pow (3, num_of_child - i) * 1024), &(chan_inf[i].buf)) != BUF_SUCCESS){
 
                 printf ("err(parent): cannot create buffer\n");
                 exit (1);
@@ -210,7 +210,7 @@ int main (int argc, char* argv[]){
 
         if (result < 0){
 
-            printf ("err: fcntl() for read\n");
+            printf ("err: fcntl() for read #%ld\n", i);
             exit (1);
         }
 
@@ -218,7 +218,7 @@ int main (int argc, char* argv[]){
 
         if (result < 0){
 
-            printf ("err: fcntl() for write\n");
+            printf ("err: fcntl() for write #%ld\n", i);
             exit (1);
         }
     }
@@ -320,15 +320,15 @@ int main (int argc, char* argv[]){
     return 0;
 }
 
-int create_circle_buff (size_t size, circle_buff buffer){
+int create_circle_buff (size_t size, circle_buff *buffer){
 
-    buffer = (circle_buff) calloc (1, sizeof (circle_buff_t));
+    *buffer = (circle_buff) calloc (1, sizeof (struct circle_buff_t));
     if (buffer == NULL){
 
         return BUF_FAILURE;
     }
     
-    circle_buff tmp = buffer;
+    circle_buff tmp = *buffer;
 
     tmp -> p_buff = (char*) calloc (size , sizeof (char));
     if (tmp -> p_buff == NULL){
@@ -345,7 +345,7 @@ int create_circle_buff (size_t size, circle_buff buffer){
 
 int destroy_circle_buff (circle_buff buffer){
 
-    if (*buffer == NULL){
+    if (buffer == NULL){
 
         return BUF_FAILURE;
     }
