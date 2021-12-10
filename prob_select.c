@@ -42,8 +42,8 @@ enum CIRCLE_BUFF_RES {
 
 int    create_circle_buff (size_t size, circle_buff *buffer);
 int    destroy_circle_buff (circle_buff buffer);
-int    circle_buffer_fd_reader (circle_buff buffer, int fd, size_t num, int *read_res);
-int    circle_buffer_fd_writter (circle_buff buffer, int fd, size_t num, int *write_res);
+int    circle_buffer_fd_reader (circle_buff buffer, int fd, int *read_res);
+int    circle_buffer_fd_writter (circle_buff buffer, int fd, int *write_res);
 size_t circle_buffer_get_size (circle_buff buffer);
 int    circle_buffer_is_empty (circle_buff buffer);
 int    circle_buffer_is_full (circle_buff buffer);
@@ -266,7 +266,7 @@ int main (int argc, char* argv[]){
 
                 int read_result = 0;
 
-                if (circle_buffer_fd_reader (chan_inf[i].buf, chan_inf[i].fd_from, circle_buffer_get_size (chan_inf[i].buf), &read_result) != BUF_SUCCESS){
+                if (circle_buffer_fd_reader (chan_inf[i].buf, chan_inf[i].fd_from, &read_result) != BUF_SUCCESS){
                     
                     printf ("err: read\n");
                     exit (1);
@@ -288,7 +288,7 @@ int main (int argc, char* argv[]){
             if (FD_ISSET (chan_inf[i].fd_to, &wfds)){
 
                 int write_result = 0;
-                if (circle_buffer_fd_writter (chan_inf[i].buf, chan_inf[i].fd_to, circle_buffer_get_size(chan_inf[i].buf), &write_result) != BUF_SUCCESS){
+                if (circle_buffer_fd_writter (chan_inf[i].buf, chan_inf[i].fd_to, &write_result) != BUF_SUCCESS){
 
                     printf ("err: write\n");
                     exit (1);
@@ -362,7 +362,7 @@ int destroy_circle_buff (circle_buff buffer){
     return BUF_SUCCESS;
 }
 
-int circle_buffer_fd_reader (circle_buff buffer, int fd, size_t num, int *read_res){
+int circle_buffer_fd_reader (circle_buff buffer, int fd, int *read_res){
 
     if (buffer == NULL || buffer -> p_buff ==NULL){
 
@@ -379,7 +379,7 @@ int circle_buffer_fd_reader (circle_buff buffer, int fd, size_t num, int *read_r
         buffer -> wi += result;
     }
 
-    if (result != NULL){
+    if (result != 0){
 
         *read_res = result;
     }
@@ -387,7 +387,7 @@ int circle_buffer_fd_reader (circle_buff buffer, int fd, size_t num, int *read_r
     return BUF_SUCCESS;
 }
 
-int circle_buffer_fd_writter (circle_buff buffer, int fd, size_t num, int *write_res){
+int circle_buffer_fd_writter (circle_buff buffer, int fd, int *write_res){
 
     if (buffer == NULL || buffer -> p_buff == NULL){
         
