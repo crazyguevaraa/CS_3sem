@@ -9,6 +9,7 @@
 #include <sys/prctl.h>
 #include <signal.h>
 #include <assert.h>
+#include <errno.h>
 
 #define MAX(a,b) ((a > b) ? a : b)
 #define MIN(a ,b) ((a < b) ? a : b)
@@ -51,7 +52,8 @@ void   free_all (struct chan_inf *arr, size_t num);
 
 
 int main (int argc, char* argv[]){
-
+    
+    errno = 0;
     char* file_name = argv[1];
     char* cur_end = NULL;
 
@@ -183,18 +185,18 @@ int main (int argc, char* argv[]){
 
                 close (fd_ptr_to[1]);
 
-                chan_inf[i].fd_from = fd_ptr_from[0];
+                chan_inf[0].fd_from = fd_ptr_from[0];
 
                 if (num_of_child == 1){
                 
-                   chan_inf[i].fd_to = STDOUT_FILENO;
+                   chan_inf[0].fd_to = STDOUT_FILENO;
                 }
             }
 
             else {
 
                 chan_inf[i - 1].fd_to = fd_ptr_to[1];
-                chan_inf[i - 1].fd_from = fd_ptr_from[0];
+                chan_inf[i].fd_from = fd_ptr_from[0];
 
                 if (i == num_of_child - 1){
 
@@ -207,7 +209,7 @@ int main (int argc, char* argv[]){
     for (long i = 0; i < num_of_child; i++){
 
         int result = fcntl (chan_inf[i].fd_from, F_SETFL, O_NONBLOCK);
-
+        
         if (result < 0){
 
             printf ("err: fcntl() for read #%ld\n", i);
