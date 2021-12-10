@@ -198,7 +198,7 @@ int main (int argc, char* argv[]){
 	}
 
         unlink (uniq_name);
-	//unlink (global_name);
+	unlink (global_name);
 }
 
 
